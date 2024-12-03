@@ -14,9 +14,13 @@ declare module "sst" {
       "type": "sst.aws.StaticSite"
       "url": string
     }
-    "IdentityPool": {
+    "MyIdentityPool": {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
+    }
+    "MyUserPool": {
+      "id": string
+      "type": "sst.aws.CognitoUserPool"
     }
     "Notes": {
       "name": string
@@ -30,11 +34,7 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Bucket"
     }
-    "UserPool": {
-      "id": string
-      "type": "sst.aws.CognitoUserPool"
-    }
-    "UserPoolClient": {
+    "Web": {
       "id": string
       "secret": string
       "type": "sst.aws.CognitoUserPoolClient"
