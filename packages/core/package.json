@@ -14,7 +14,6 @@
     "sst": "*"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.145",
-    "vitest": "^2.0.3"
+    "@types/aws-lambda": "^8.10.145"
   }
 }
