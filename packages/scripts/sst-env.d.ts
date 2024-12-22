@@ -22,6 +22,10 @@ declare module "sst" {
       "id": string
       "type": "sst.aws.CognitoUserPool"
     }
+    "MyWeb": {
+      "type": "sst.aws.StaticSite"
+      "url": string
+    }
     "Notes": {
       "name": string
       "type": "sst.aws.Dynamo"
