@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { map, tap, throwError } from 'rxjs';
-import { isMatching, match, Pattern } from 'ts-pattern';
+import { computed, inject, Injectable } from '@angular/core';
+import { catchError, delay, map, Observable, throwError } from 'rxjs';
+import { match, Pattern } from 'ts-pattern';
+import { rxResource } from '@angular/core/rxjs-interop';
 
 const FixedHeightPattern = {
   images: {
@@ -11,15 +12,46 @@ const FixedHeightPattern = {
   },
 } as const;
 
+type GiphyResponse = {
+  data: Pattern.infer<typeof FixedHeightPattern>;
+};
+
 @Injectable({
   providedIn: 'root',
 })
 export class GiphyService {
-  private readonly http = inject(HttpClient);
-  private readonly API_KEY = 'vxDDLFdCxLjyUCumrDGUiFyO7Jsr0Xcd';
-  private readonly query = `https://api.giphy.com/v1/gifs/search?api_key=${this.API_KEY}&q=dog&limit=25&offset=0&rating=g&lang=en`;
+  private readonly http: HttpClient = inject(HttpClient);
+  private readonly API_KEY: string = 'vxDDLFdCxLjyUCumrDGUiFyO7Jsr0Xcd';
+  private readonly query: string = `https://api.giphy.com/v1/gifs/search?api_key=${this.API_KEY}&q=dog&limit=25&offset=0&rating=g&lang=en`;
 
-  otherFetch() {
+  private readonly giphy$ = this.http.get<GiphyResponse>(this.query).pipe(
+    delay(1000),
+    map((res: unknown) => {
+      return match(res)
+        .with(
+          {
+            data: Pattern.array(FixedHeightPattern),
+          },
+          ({ data }) => data.map((v) => v.images.fixed_height.url),
+        )
+        .otherwise(() => {
+          throw new Error('Something bad happened');
+        });
+    }),
+    catchError(() => {
+      return throwError(() => 'Something bad happened');
+    }),
+  );
+
+  giphyResource = rxResource({
+    loader: () => this.giphy$,
+  });
+
+  fixedHeightUrls = computed(
+    () => this.giphyResource.value() ?? ([] as string[]),
+  );
+
+  get(): Observable<string[]> {
     return this.http.get(this.query).pipe(
       map((res: unknown) => {
         return match(res)
@@ -27,36 +59,15 @@ export class GiphyService {
             {
               data: Pattern.array(FixedHeightPattern),
             },
-            ({ data }) => data.map((v) => v.images.fixed_height.url)
+            ({ data }) => data.map((v) => v.images.fixed_height.url),
           )
-          .otherwise(() => throwError(() => 'Something bad'));
-      })
-    );
-  }
-  fetch() {
-    return this.http.get(this.query).pipe(
-      tap((res: unknown) => {
-        console.log(res);
+          .otherwise(() => {
+            throw new Error('Something bad happened');
+          });
       }),
-      map((res: unknown) => {
-        if (
-          isMatching(
-            {
-              data: Pattern.array({
-                images: {
-                  fixed_height: {
-                    url: Pattern.string,
-                  },
-                },
-              }),
-            },
-            res
-          )
-        ) {
-          return res.data.map((v) => v.images.fixed_height.url);
-        }
+      catchError(() => {
         return throwError(() => 'Something bad happened');
-      })
+      }),
     );
   }
 

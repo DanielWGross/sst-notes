@@ -1,23 +1,11 @@
-import { Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { GiphyService } from './giphy.service';
-import { Observable } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, AsyncPipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './app.component.css',
 })
-export class AppComponent {
-  private readonly giphyService = inject(GiphyService);
-
-  images$!: Observable<any>;
-  title = 'angular';
-  region = import.meta.env['NG_APP_REGION'];
-
-  ngOnInit() {
-    this.images$ = this.giphyService.fetch();
-  }
-}
+export class AppComponent {}
