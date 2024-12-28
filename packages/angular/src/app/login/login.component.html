@@ -1,0 +1,32 @@
+<div class="Login">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="d-grid gap-3">
+      <div class="mb-3" id="email">
+        <label for="emailInput" class="form-label">Email</label>
+        <input
+          id="emailInput"
+          class="form-control form-control-lg"
+          type="email"
+          autofocus
+          formControlName="email"
+        />
+      </div>
+      <div class="mb-3" id="password">
+        <label for="passwordInput" class="form-label">Password</label>
+        <input
+          id="passwordInput"
+          class="form-control form-control-lg"
+          type="password"
+          formControlName="password"
+        />
+      </div>
+      <button
+        class="btn btn-primary btn-lg"
+        type="submit"
+        [disabled]="!loginForm.valid"
+      >
+        Login
+      </button>
+    </div>
+  </form>
+</div>
